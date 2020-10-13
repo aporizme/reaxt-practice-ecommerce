@@ -3,14 +3,29 @@ import "./Header.css";
 function Header() {
   return (
     <div className="header">
-      <div className="header_logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/1280px-Amazon_logo.svg.png" />
-      </div>
+      <img
+        className="header__logo"
+        src="https://jitsvinger.co.za/wp-content/uploads/2018/04/Amazon-Logo-1024x373.png"
+      />
+
       <div className="header_search">
         <input className="header_searchInput" type="text" />
         {/* Logo */}
       </div>
-      <div className="header_nav"></div>
+      <div className="header_nav">
+        <div className="header_option">
+          <span className="header_optionLineOne">Hello Guest</span>
+          <span className="header_optionLineTwo">Sign In</span>
+        </div>
+        <div className="header_option">
+          <span className="header_optionLineOne">Returns</span>
+          <span className="header_optionLineTwo">& Orders</span>
+        </div>
+        <div className="header_option">
+          <span className="header_optionLineOne">Your</span>
+          <span className="header_optionLineTwo">Prime</span>
+        </div>
+      </div>
     </div>
   );
 }
