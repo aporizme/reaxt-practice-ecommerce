@@ -1,7 +1,23 @@
 import { Button } from '@material-ui/core'
 import React from 'react'
 import './Product.css'
-function Product({ title, price, image, rating }) {
+import { useStateValue } from './StateProvider'
+function Product({id, title, price, image, rating }) {
+    const [{ basket }, dispatch] = useStateValue();
+
+    const addToBasket = () =>{
+        //dispatch the item into the data layer
+        dispatch({
+            type: "ADD_TO_BASKET",
+            item: {
+                id: id,
+                title: title,
+                image: image,
+                price: price,
+                rating:rating,
+            },
+        });
+    };
     return (
         <div className="product">
              
@@ -18,7 +34,7 @@ function Product({ title, price, image, rating }) {
                 </div>
             </div>
             <img src = {image}/>
-            <button>Add to Basket</button>   
+            <button onClick={addToBasket}>Add to Basket</button>   
         </div>
     )
 }
