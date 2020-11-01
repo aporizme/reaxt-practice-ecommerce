@@ -1,29 +1,35 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import React, { useEffect, useState } from "react";
 import CurrencyFormat from "react-currency-format";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import CheckoutProduct from "./CheckoutProduct";
 import "./Payment.css";
 import { getBasketTotal } from "./reducer";
 import { useStateValue } from "./StateProvider";
+import axios from "./axios";
 
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
-
+  const history = useHistory();
   const stripe = useStripe();
   const elements = useElements();
 
-  const [succeeded, setSucceed] = useState(false);
+  const [succeeded, setSucceeded] = useState(false);
   const [processing, setProcessing] = useState("");
   const [error, setError] = useState(null);
   const [disabled, setDisabled] = useState(true);
-  const [clientSecret, ClientSecret] = useState(true);
+  const [clientSecret, setClientSecret] = useState(true);
 
   useEffect(() => {
     //generate the special stripe secret which allows us to charge a customer
 
     const getClientSecret = async () => {
-      const response = await axios;
+      const response = await axios({
+        method: "post",
+        //Stripe expects the total in a currencies submits
+        url: "/payments/create?total=_{getBasketTotal(basket) * 100}",
+      });
+      setClientSecret(response.data.clientSecret);
     };
     getClientSecret();
   }, [basket]);
@@ -33,7 +39,21 @@ function Payment() {
     event.preventDefault();
     setProcessing(true);
 
-    const payload = await stripe;
+    const payload = await stripe
+      .confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement),
+        },
+      })
+      .then(({ paymentIntent }) => {
+        // paymentIntent= payment confirmation
+
+        setSucceeded(true);
+        setError(null);
+        setProcessing(false);
+
+        history.replace("/orders");
+      });
   };
 
   const handleChange = (event) => {
