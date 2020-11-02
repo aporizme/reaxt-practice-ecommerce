@@ -8,6 +8,7 @@ import { getBasketTotal } from "./reducer";
 import { useStateValue } from "./StateProvider";
 import axios from "./axios";
 import ReactDOM from "react-dom";
+import { db } from "./firebase";
 function Payment() {
   const [{ basket, user }, dispatch] = useStateValue();
   const history = useHistory();
@@ -27,7 +28,7 @@ function Payment() {
       const response = await axios({
         method: "post",
         //Stripe expects the total in a currencies submits
-        url: "/payments/create?total=${getBasketTotal(basket) * 100;}",
+        url: "/payments/create?total=${getBasketTotal(basket) * 100}",
       });
       setClientSecret(response.data.clientSecret);
     };
@@ -35,6 +36,7 @@ function Payment() {
   }, [basket]);
 
   console.log("THE SECRET is", clientSecret);
+  console.log(":))))", user);
 
   const handleSubmit = async (event) => {
     //do all fancy stripe stuff
@@ -49,10 +51,23 @@ function Payment() {
       })
       .then(({ paymentIntent }) => {
         // paymentIntent= payment confirmation
+        db.collection("users")
+          .doc(user?.uid)
+          .collection("orders")
+          .doc(paymentIntent.id)
+          .set({
+            basket: basket,
+            amount: paymentIntent.amount,
+            created: paymentIntent.created,
+          });
 
         setSucceeded(true);
         setError(null);
         setProcessing(false);
+
+        dispatch({
+          type: "EMPTY_BASKET",
+        });
 
         history.replace("/orders");
       });
@@ -118,7 +133,7 @@ function Payment() {
                   prefix={"$"}
                 />
                 <button disabled={processing || disabled || succeeded}>
-                  <span>{processing ? <p>Processing</p> : "Buy Now"}</span>
+                  <span>{processing ? <p>Processing...</p> : "Buy Now"}</span>
                 </button>
               </div>
               {/* Errors */}
