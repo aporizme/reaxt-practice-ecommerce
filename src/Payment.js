@@ -27,7 +27,7 @@ function Payment() {
     const getClientSecret = async () => {
       const response = await axios({
         method: "post",
-        //Stripe expects the total in a currencies submits
+        //Stripe expects the total in a currencies submitsss
         //BUG ALERT "$" is not recognized as an object by my vscode, y is dat??
         url: "/payments/create?total=${getBasketTotal(basket) * 100}",
       });
