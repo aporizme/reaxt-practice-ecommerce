@@ -28,6 +28,7 @@ function Payment() {
       const response = await axios({
         method: "post",
         //Stripe expects the total in a currencies submits
+        //BUG ALERT "$" is not recognized as an object by my vscode, y is dat??
         url: "/payments/create?total=${getBasketTotal(basket) * 100}",
       });
       setClientSecret(response.data.clientSecret);
